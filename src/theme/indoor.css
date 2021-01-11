@@ -1,0 +1,16 @@
+.img {
+    width: 100px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+.cards {
+    background-color:darkgray;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
