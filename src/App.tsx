@@ -51,9 +51,6 @@ const App: React.FC = () => (
           <Route path="/home" component={Home}  />
           <Route path="/about" component={About}  />
           <Route path="/contact" component={Contact}  />
-          <Route path="/indoorfootball" component={IndoorFootball}  />
-          <Route path="/football-7" component={Football7}  />
-          <Route path="/football-11" component={Football_11}  />
           <Route path="/" render={() => <Redirect to="/tab1" />} exact={true} />
         </IonRouterOutlet>
         <IonTabBar slot="bottom">

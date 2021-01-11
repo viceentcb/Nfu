@@ -4,12 +4,6 @@ import epgData from '../../data/epg.json';
 import {
   IonSlides,
   IonSlide,
-  IonRow,
-  IonLabel,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
 } from '@ionic/react';
 
 //Assets
@@ -18,6 +12,27 @@ import './style.css';
 /**
  * Epg Class
  */
+
+
+customElements.define('modal-page', class extends HTMLElement {
+  connectedCallback() {
+    const modalElement = document.querySelector('ion-modal');
+this.innerHTML = `
+<ion-header>
+  <ion-toolbar>
+    <ion-title>    ${modalElement.componentProps.data.title}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+    ${modalElement.componentProps.data.description}
+</ion-content>`;
+  }
+});
+
+
+
+
 
 export default class Epg extends React.Component {
 
@@ -47,35 +62,29 @@ export default class Epg extends React.Component {
   }
 
 
-  /**
-   * I use this function to show using an alert the Description of TVE program
-   * @param {*} text 
-   */
-  DescriptionClik(text) {
-    // console.log(this.state.events.spa);
-    // console.log(text)
-    const alert = document.createElement('ion-alert');
-    alert.cssClass = 'my-custom-class';
-    alert.header = this.state.title;
-    alert.subHeader = 'Descripcion';
-    alert.message = text;
-    alert.buttons = ['Return'];
-    document.body.appendChild(alert);
-    return alert.present();
+  
+   presentModal(data) {
+     console.log(data)
+    // create the modal with the `modal-page` component
+    const modalElement = document.createElement('ion-modal');
+    modalElement.component = 'modal-page';
+    modalElement.cssClass = 'my-custom-class';
+  
+    modalElement.componentProps = {
+      'data': data,
+  
+    };
+    // present the modal
+    document.body.appendChild(modalElement);
+    return modalElement.present(data);
   }
 
-  /**
-   *  The function convertUTCtoDate convert the seconds that we have in the Epg json 
-   *  to weekday + number , month and finaly the year 
-   *  from ES locale
-   * @param {*} utcEpoch 
-   */
-  convertUTCtoDate(utcEpoch) {
+  ConvertDate(utcEpoch) {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', time: 'numeric' };
     //console.log(options)
-    let d = new Date(0);
-    d.setUTCSeconds(utcEpoch);
-    return d.toLocaleString("es-ES", options);
+    let date = new Date(0);
+    date.setUTCSeconds(utcEpoch);
+    return date.toLocaleString("es-ES", options);
   }
 
   /**
@@ -99,51 +108,51 @@ export default class Epg extends React.Component {
 
     return (
 
-      <IonRow>
-        <IonLabel className="my-label">
+      <ion-row
+>
+        <ion-label className="my-label">
           <ion-header>
             {this.state.title}
             <img class="icon" src="https://upload.wikimedia.org/wikipedia/commons/1/19/Logo_TVE-1.svg"></img>
           </ion-header>
-        </IonLabel>
+        </ion-label>
         <IonSlides options={slideOpts}>
 
           {this.state.events.map((eventEPG, index) => (
             <IonSlide >
-              <IonCard key={'col_' + index}>
-                <IonCardHeader>
-                  <IonCardTitle>{this.convertUTCtoDate(eventEPG.spa.start)}</IonCardTitle>
-                  <IonCardTitle>
+              <ion-card key={'col_' + index}>
+                <ion-card-header>
+                  <ion-card-title>{this.ConvertDate(eventEPG.spa.start)}</ion-card-title>
+                  <ion-card-title>
                     <ion-chip>
                       <ion-label>
                         {eventEPG.spa.name}
                       </ion-label>
                     </ion-chip>
-                  </IonCardTitle>
-                </IonCardHeader>
+                  </ion-card-title>
+                </ion-card-header>
 
-                <IonCardContent>
+                <ion-card-content>
                   
-                  <IonCardTitle>
-                    {"Desde:" + this.ConvertSeconds(eventEPG.spa.start)}
-                    {" Hasta:" +  this.ConvertSeconds((eventEPG.spa.start + eventEPG.spa.duration))}
-                  </IonCardTitle>
-
-
+                  <ion-card-title>
+                    {"For:  " + this.ConvertSeconds(eventEPG.spa.start)} <br/>
+                    {"To:  " +  this.ConvertSeconds((eventEPG.spa.start + eventEPG.spa.duration))}
+                  </ion-card-title>
 
                   <ion-buttons slot="primary">
-                    <h1 key={index} onClick={() => this.DescriptionClik(eventEPG.spa.ext.text)}>
+                    <h1 key={index} onClick={() => this.presentModal({ "description": eventEPG.spa.ext.text, "title":eventEPG.spa.name})}>
                       Description
                     </h1>
                   </ion-buttons>
 
                   
-                </IonCardContent>
-              </IonCard>
+                </ion-card-content>
+              </ion-card>
             </IonSlide>
           ))}
         </IonSlides>
-      </IonRow>
+      </ion-row
+>
 
     );
   }
